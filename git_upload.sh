@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd E:/hexoBlog
+cd D:/study/hexoBlog
 
 if [ -z $(git status -s) ]; then
   echo "No changes detected, skipping commit and push."
