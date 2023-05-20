@@ -1,3 +1,8 @@
+---
+title: icpc滚版工具
+tag: acm
+---
+
 [icpc滚榜工具](https://tools.icpc.global/)
 
 个人使用的是2.4.727版本
