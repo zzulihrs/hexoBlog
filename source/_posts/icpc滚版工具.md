@@ -1,5 +1,5 @@
 ---
-title: icpc滚版工具
+title: icpc滚榜工具
 tag: acm
 ---
 
