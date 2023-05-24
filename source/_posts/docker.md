@@ -86,6 +86,32 @@ docker build -t 镜像名称:[tag]
 
 ### Docker-Compose
 
+```
+之前运行一个镜像，需要添加大量的参数
+可以哦那个过Docker-compose编写这些参数
+Docker-compose可以帮助我们批量管理容器
+只需要通过一个docker-compose.yml文件去维护即可
+```
+
+```
+# 1.去github下载docker-compose 1.24.1版本
+
+# 2. 拖拽到linux上
+
+# 3. 需要将docker-compose名字修改一下，并给其可执行的权限
+mv docker-compose-Linux-x86_64 docker-compose
+chmod 777 docker-compose
+
+# 4. 为了方便后期操作，配置环境变量
+# 将docker-compose文件移动到/usr/local，修改了/etc/profile
+mv docker-compose /usr/local/bin
+vim /etc/profile
+export /usr/local/bin:$path
+source /etc/profile
+```
+
+
+
 
 
 
