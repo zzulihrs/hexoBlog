@@ -368,7 +368,10 @@ algolia_search:
 
 # Local search
 local_search:
-  enable: false
+  enable: true
+  labels:
+    input_placeholder: Search for Posts
+    hits_empty: "We didn't find any results for the search: ${query}" # 如果没有查到内容相关内容显示
   # Preload the search data when the page loads.
   preload: false
   # Show top n results per article, show all results by setting to -1
