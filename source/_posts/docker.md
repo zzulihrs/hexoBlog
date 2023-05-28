@@ -116,8 +116,6 @@ source /etc/profile
 
 
 
-
-
 ### 数据卷
 
 数据卷：将宿主机中一个目录映射到容器的一个目录中，可以在宿主机中操作目录的内容，那么容器内部映射的文件，也会跟着一起改变
@@ -140,24 +138,157 @@ docker run -v 数据卷名称:容器内部路径 镜像id
 docker run -v 路径:容器内部路径 镜像id
 ```
 
+yml文件
+
+```yml
+version: '3.1'
+service:
+    mysql: #服务的名称
+        restart: always # 代表只要docker启动，那么这个让其就跟着一起启动
+        image: daocloud.io/library/mysql:5.7.4 # 指定镜路径
+        container_name: mysql # 指定容器名称
+        ports:
+            - 3306:3306 # 指定端口号映射
+        environment:
+            MYSQL_ROOT_PASSWORD: root # 指定Mysql的ROOT用户登录密码
+            TZ: Asia/Shanghai         # 指定时区
+        volumes:
+            - /opt/docker_mysql_tomcat/mysql_data:/var/lib/mysql # 映射数据卷
+    tomcat:
+        restart: always 
+        image: daocloud.io/library/tomcat:8.5.16-jre8-alpine
+        container_name: tomcat 
+        ports:
+            - 8080:8080 
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            TZ: Asia/Shanghai         
+        volumes:
+            - /opt/docker_mysql_tomcat/tomcat_webapps:/usr/local/tomcat/webapps 
+            - /opt/docker_mysql_tomcat/tomcat_logs:/usr/local/tomcat/logs
+```
 
 
 
+### 使用docker-compose命令管理容器
+
+在使用docker-compose的命令时，默认会在当前目录下找到yml文件
+
+```
+# 1. 基于docker-compose.yml启动管理的容器
+docker-compose up -d
+# 2. 关闭并删除容器
+docker-compose down
+# 3. 开启或关闭已经存在的由docker-compose维护的容器
+docker-compose start/stop/restart
+# 4. 查看docker-compose管理的容器
+docker-compose ps
+# 5. 查看日志
+docker-compose logs -f
+```
 
 
 
-`docker pull images `
+### docker-compose配置Dockerfile使用
 
-`docker ps -a` 查看本地容器
+```
+使用docker-compose.yml文件以及Dockerfile文件再生成自定义镜像的同时启动当前镜像，并且由docker-compose去管理容器
+```
 
-`docker images` 查看镜像
+```
+# yml 文件
+version: '3.1'
+service:
+  ssm:
+     restart: always
+     build:   # 构建自定义镜像
+        context: ../   # 指定Dockerfile文件的所在路径
+        dockerfile: Dockerfile # 指定dockerfile文件名称
+     images: ssm:1.0.1
+     container_name: ssm
+     ports:
+        8081:8080
+     environment:
+        TZ: Asia/Shanghai
+```
 
-`docker top container`查看容器的所有进程
+```
+# dockerfile文件
+from daocloud.io/library/tomcat:8.5.15-jre8
+copy ssm.war /usr/local/tomcat/webapps
+```
 
-`docker [container] attach CONTAINER`：进入容器
-				先按Ctrl-p，再按Ctrl-q可以挂起容器
+```
+# 可以直接启动基于docker-compose.yml以及Dockerfile文件构建的自定义镜像
+docker-compose up -d
+# 重新构建自定义镜像
+docker-compose build
+# 运行前重新构建
+docker-compose up -d -build
+```
 
-docker rm/start/stop
+### Docker C运行I、CD
+
+```
+项目部由
+	1. 将项目通过maven进行编译打包
+	2. 将文件上传到指定的服务器
+	3. 将war包放到tomcat的目录
+	4. 通过Dockerfile将Tomcat和war包转成一个镜像，由DockerCompose去运行容器
+项目更新：需要将上述流程再次重来一遍
+```
+
+#### CI介绍
+
+```
+CI(contimuous intergration) 持续集成
+持续集成：编写代码时，完成了一个功能后，立即提交代码到Git仓库中，将项目重新的构建并且测试
+* 快速发现错误
+* 防止代码偏离主分支
+```
+
+### 实现持续集成
+
+#### 搭建Gitlab服务器
+
+```
+1. 创建一个全新的虚拟机，并且至少指定4G的运行内存
+2. 安装docker以及docker-compose
+3. docker-compose.yml文件去安装gitlab服务器
+```
+
+实现持续交付持续部署
+
+安装Jenkins
+
+```
+version: '3.1'
+services:
+    jenkins:
+        image: jenkins/jenkins
+        restart: always
+        container_name: jenkins
+        ports:
+           - 8888:8080
+           - 50000:50000
+        volumes:
+           - ./data:/var/jenkins_home
+```
+
+第一次运行时，会因为data目录没有权限，导致启动失败
+
+chmod 777 data
+
+docker-compose restart
+
+输入密码，日志中可以看到
 
 
+
+### 配置目标服务器及GitLab免密登录
+
+```
+GitLab -> Jenkins -> 目标服务器
+1、jenkins去lian'jie
+```
 
