@@ -5,9 +5,36 @@ tag: vue
 
 [b站链接](https://www.bilibili.com/video/BV1j5411o7xH/?spm_id_from=333.999.0.0&vd_source=c486ded0b26b82075e9c932c97bc4fc1)
 
-- [ ] [01 采购系统-项目介绍](https://www.bilibili.com/video/BV1j5411o7xH?p=1)
-- [ ] [02 采购系统-项目分类](https://www.bilibili.com/video/BV1j5411o7xH?p=2)
-- [ ] [03 采购系统-项目搭建](https://www.bilibili.com/video/BV1j5411o7xH?p=3)
+- [x] [01 采购系统-项目介绍](https://www.bilibili.com/video/BV1j5411o7xH?p=1)
+
+生鲜商城采购管理系统
+
+- [x] [02 采购系统-项目分类](https://www.bilibili.com/video/BV1j5411o7xH?p=2)
+
+web前端网页
+
+web后端管理
+
+- [x] [03 采购系统-项目搭建](https://www.bilibili.com/video/BV1j5411o7xH?p=3)
+
+## 项目创建
+
+```
+vue create vue-project
+vue add element
+nmp i axios -S
+npm i querystring -S
+npm i normalize.css -S
+npm i echarts -S
+
+```
+
+## 后台项目
+
+nodejs+mysql+Express
+
+
+
 - [ ] [04 采购系统-后端数据库导入](https://www.bilibili.com/video/BV1j5411o7xH?p=4)
 - [ ] [05 采购系统-项目初始化](https://www.bilibili.com/video/BV1j5411o7xH?p=5)
 - [ ] [06 采购系统-layout布局](https://www.bilibili.com/video/BV1j5411o7xH?p=6)

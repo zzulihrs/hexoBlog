@@ -2,6 +2,8 @@
 
 cd D:/study/hexoBlog
 
+git pull
+
 if [ -z $(git status -s) ]; then
   echo "No changes detected, skipping commit and push."
   exit 0
