@@ -1,3 +1,9 @@
+---
+title: vue后台项目
+tag: vue
+category: vue
+---
+
 - [x] [01-vue通用后台管理（功能展示和项目搭建）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=1)
 - [x] [02-vue通用后台管理（yarn-npm安装的对比）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=2)
 - [x] [03-vue通用后台管理（vue-cli搭建的详细过程）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=3)
