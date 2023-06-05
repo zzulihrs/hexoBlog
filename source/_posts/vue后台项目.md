@@ -21,7 +21,7 @@ category: vue
 - [x] [15-vue通用后台管理（菜单点击跳转功能实现）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=15)
 - [x] [16-vue通用后台管理（header组件搭建与样式调整）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=16)
 - [x] [17-vue通用后台管理（vuex实现左侧折叠）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=17)
-- [ ] [18-vue通用后台管理（左侧折叠遗留问题解决）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=18)
+- [x] [18-vue通用后台管理（左侧折叠遗留问题解决）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=18)
 - [ ] [19-vue通用后台管理（home组件布局）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=19)
 - [ ] [20-vue通用后台管理（home购买统计部分）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=20)
 - [ ] [21-vue通用后台管理（home订单统计实现）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=21)
