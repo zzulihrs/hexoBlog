@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd E:/hexoBlog
+cd D:/study/hexoBlog
 
 git pull
 
