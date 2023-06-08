@@ -36,7 +36,7 @@ category: vue
 - [x] [30-vue通用后台管理（面包屑，tag介绍）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=30)
 - [x] [31-vue通用后台管理（面包屑数据处理）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=31)
 - [x] [32-vue通用后台管理（面包屑样式遗留问题处理）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=32)
-- [ ] [33-vue通用后台管理（tag功能介绍&页面编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=33)
+- [x] [33-vue通用后台管理（tag功能介绍&页面编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=33)
 - [ ] [34-vue通用后台管理（tag点击与删除事件）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=34)
 - [ ] [35-vue通用后台管理（用户管理页面功能&form组件介绍）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=35)
 - [ ] [36-vue通用后台管理（用户管理页面功能form页面编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=36)
