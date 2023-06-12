@@ -42,7 +42,7 @@ category: vue
 - [x] [36-vue通用后台管理（用户管理页面功能form页面编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=36)
 - [x] [37-vue通用后台管理（用户管理页面功能form新增功能编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=37)
 - [x] [37-1-vue通用后台管理（用户管理页面table数据获取）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=38)
-- [ ] [38-vue通用后台管理（用户管理页面table列表编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=39)
+- [x] [38-vue通用后台管理（用户管理页面table列表编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=39)
 - [ ] [39-vue通用后台管理（用户管理页面新增编辑提交功能编写）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=40)
 - [ ] [40-vue通用后台管理（用户管理页面剩余功能解决）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=41)
 - [ ] [41-vue通用后台管理（权限管理功能介绍）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=42)
