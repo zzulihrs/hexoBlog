@@ -50,7 +50,7 @@ category: vue
 - [x] [43-vue通用后台管理（登录权限和导航守卫）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=44)
 - [x] [44-vue通用后台管理（登录接口逻辑实现）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=45)
 - [x] [45-vue通用后台管理（菜单权限功能）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=46)
-- [ ] [46-vue通用后台管理（权限管理问题解决&登出功能实现）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=47)
+- [x] [46-vue通用后台管理（权限管理问题解决&登出功能实现）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=47)
 - [ ] [47-vue通用后台管理（如何去掉mock掉后端数据）](https://www.bilibili.com/video/BV1QU4y1E7qo?p=48)
 - [ ] [【前端面试】前端简历编写详细介绍](https://www.bilibili.com/video/BV1QU4y1E7qo?p=49)
 - [ ] [【前端面试】面试官问各种问题的目的](https://www.bilibili.com/video/BV1QU4y1E7qo?p=50)
