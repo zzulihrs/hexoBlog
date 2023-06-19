@@ -350,3 +350,7 @@ export default {
 
 
 
+ocalhost:8081/RotatingMachineryGraph/OrbitOfShaftCenter1?equipmentUuid=1
+
+ocalhost:8081/RotatingMachineryGraph/OrbitOfShaftCenter1?equipmentUuid=2
+
