@@ -61,8 +61,6 @@ tag: acm
 
 ![img](https://pic1.zhimg.com/80/v2-321e3b1399c133241a6c6ebae4b7161c_720w.png?source=d16d100b)
 
-
-
 编辑
 
 添加图片注释，不超过 140 字（可选）
@@ -70,8 +68,6 @@ tag: acm
 设置好奖项后，点击save，文件名为contest.json
 
 ![img](https://picx.zhimg.com/80/v2-bd2b757ba9d6aa78fa7c192977d29975_720w.png?source=d16d100b)
-
-
 
 编辑切换为居中
 
