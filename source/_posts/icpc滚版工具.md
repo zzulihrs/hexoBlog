@@ -1,7 +1,12 @@
 ---
 title: icpc滚榜工具
-tag: acm
+author: 
+date: 2022-12-30 15:52:07
+tags: acm
+categories: 文|技|艺|译
 ---
+
+
 
 [icpc滚榜工具](https://tools.icpc.global/)
 
