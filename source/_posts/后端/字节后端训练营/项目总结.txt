@@ -1,0 +1,134 @@
+[青训营X豆包MarsCode 技术训练营 - 电商项目方案](https://bytedance.larkoffice.com/docx/PC36d3DaCotg6gxre1mcbttfnub)
+
+
+
+​	这个项目也是磕磕绊绊的写完了，作为一个新手项目其实还是有一定门槛的。而且其实项目部分编码不太规范，遇到问题调试起来比较麻烦。但可以了解一些后端常用的工具。
+
+​	写这篇文章的目的是总结一下自己对这个项目的理解和收获，毕竟大部分时间也只是敲了一遍，缺乏自己的理解。
+
+​	首先介绍一下个人情况，我在两年前有一段go小厂实习，虽然两年没写，但是go本身上手就很快。除了cwgo, prometheus、OpenTelemetry这一部分，其它技术大部分都是后端常用，我也用过大部分。
+
+​	然后是如何完成这个项目的，首先我不太想写前端，前端的template文件夹我是直接复制过去的，这样就节省了一些时间。掘金上的课我也就看了一点，开营没几天就直接开始看着b站视频做这个项目了，每天晚上2倍速刷个两个视频左右，代码就直接对着视频敲了。
+
+​	个人认为，新手入门某个技术，其实对着视频抄代码也没用什么问题，抄完之后稍微想想为什么要这么写，代码运行的逻辑是什么样的。很多时候最困难的就是抄错代码调试的过程和配环境的过程，这两个过程其实可以很大提升自己解决问题的能力。
+
+
+
+最后是对项目技术栈的一些简单总结：
+
+**Go**：编程语言
+
+**cwgo**: https://www.cloudwego.io/zh/docs/cwgo/tutorials/cli/
+
+**Hertz和Kitex**都是高性能的Go语言微服务框架，它们由CloudWeGo提供
+
+* **Hertz** 是一个企业级的微服务**HTTP**框架，常用于系统外部的通信，如前后端交互、API接口调用等
+
+  ```
+  cwgo server --type HTTP 这个生成的应该就是Hertz的，具体的接口细节需要自己实现
+  ```
+
+* **Kitex** 是字节跳动内部广泛使用的Golang微服务**RPC**框架，适用于系统内部的通信，特别是在微服务架构中，RPC可以实现高效的内部服务调用。这部分代码在rpc_gen里面，这部分代码是基于Protobuf生成的，基本不用修改
+
+  ```
+  生成RPC客户端和服务器
+  cwgo client --type RPC
+  cwgo server --type RPC
+  ```
+
+**OpenTelemetry**: 链路追踪、日志收集，配合prometheus使用
+
+**prometheus**: 进行指标监控
+
+**Gorm**：https://gorm.io/zh_CN/
+
+一个流行的Go语言ORM（对象关系映射）库。
+
+**Consul**：分布式注册中心，Consul允许服务通过DNS或HTTP接口注册和发现其他服务，使得服务间的通信更加灵活和动态
+
+**mysql、redis**: mysql用与存储数据，redis在项目中主要就用于验证登录状态，存了个user_id
+
+**protobuf**：Protobuf使用IDL（Interface Definition Language）文件定义数据结构，然后通过编译器生成各种语言的代码，用于序列化和反序列化数据。
+
+```
+使用步骤
+1. 定义.proto文件：在.proto文件中定义数据结构。
+2. 编译.proto文件：使用Protobuf提供的编译器protoc生成对应语言的代码。
+3. 使用生成的代码：在应用程序中使用生成的代码来序列化和反序列化数据。
+```
+
+**makefile**:
+
+```makefile
+.PHONY: gen-demo-proto
+gen-demo-proto:
+	@cd demo/demo_proto && cwgo server -I ../../idl --type RPC --module github.com/cloudwego/biz-demo/gomall/demo/demo_proto --service demo_proto --idl ../../idl/echo.proto
+使用make gen-demo-proto即可执行对应命令
+也可以用${svc}:${v} --build-arg SVC=${svc}动态添加变量
+```
+
+**docker-compose**: 定义和运行多容器 Docker 应用程序的工具
+
+使用docker-compose up -d启动即可
+
+```
+version: '3'
+services:
+  mysql:
+    image: xxx/mysql:8.0 # 国内访问docker,需要改镜像，可以直接在xxx修改
+    ports:
+      - 3306:3306
+    environment: # 环境变量
+      - MYSQL_ROOT_PASSWORD=xxx
+    volumes: # 容器卷
+      - ./db/sql/ini:/docker-entrypoint-initdb.d
+```
+
+**启动全部服务脚本:** 
+
+这种脚本直接让大模型写，随便改改就行
+
+```bash
+#!/bin/bash
+
+# 微服务的根目录
+ROOT_PATH="/root/goProjects/gomall/app"
+
+# 微服务列表，每个微服务的目录名称
+declare -a SERVICES=("cart" "checkout" "email" "frontend" "order" "payment" "product" "user")
+
+# 启动所有微服务
+for service in "${SERVICES[@]}"; do
+    echo "Starting $service..."
+    # 进入微服务目录
+    cd "$ROOT_PATH/$service"
+    # 使用 nohup 启动微服务，并将输出重定向到日志文件
+    nohup air > "$service.log" 2>&1 &
+    # 返回到脚本开始时的目录
+    cd - > /dev/null
+    echo "$service started."
+done
+
+echo "All services have been started."
+```
+
+**suite用法**
+
+在Go项目中，"suite"通常是指一组配置或者行为的集合，用于初始化和配置特定的客户端或者服务，提供了一种方便的方式来组织和管理gRPC客户端的配置选项。
+
+
+
+
+
+**项目简介**
+字节跳动青训营电商项目：做一个抖音商城。为用户提供便捷、优质的购物环境，满足用户多样化的购物需求，打造一个具有影响力的社交电商平台，提升抖音在电商领域的市场竞争力。
+
+**技术架构：**Go+Gorm+cwgo+Consul+Mysql+Redis+OpenTelemetry+Protobuf+Docker Compose
+
+**项目功能**
+
+- **用户管理**：实现用户注册、登录、信息更新等基本功能。
+- **商品管理**：支持商品的创建、编辑、删除和查询。
+- **购物车功能**：允许用户添加商品到购物车，并管理购物车内容。
+- **订单处理**：提供订单创建、管理和结算流程。
+- **支付系统**：集成支付功能，支持订单支付和取消支付操作

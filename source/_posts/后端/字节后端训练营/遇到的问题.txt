@@ -1,0 +1,130 @@
+### 问题1：
+
+**一直报错email or password or confirm password is empty**
+
+原因：auto_page.proto中的confirm_password需要和home.tmpl中的字段对应。
+
+我的前端是直接复制gomall的template文件夹，他的home.tmpl文件这个字段并不和auto_page.proto对应
+
+### 问题2：
+
+对接consul后接口无法使用。
+
+下面这种应该是正常的情况，错误的情况下没有注册服务。下图页面是localhost:8500可以打开
+
+![image-20241109234414649](https://hrs-aliyunoss.oss-cn-beijing.aliyuncs.com/imges/image-20241109234414649.png)
+
+
+
+具体实现：
+
+frontend/main.go的main函数添加
+
+```
+rpc.Init()
+```
+
+client.go
+
+```go
+package rpc
+
+import (
+	"github.com/cloudwego/biz-demo/gomall/app/frontend/conf"
+	frontendUtils "github.com/cloudwego/biz-demo/gomall/app/frontend/utils"
+	"github.com/cloudwego/biz-demo/gomall/rpc_gen/kitex_gen/user/userservice"
+	"github.com/cloudwego/kitex/client"
+	consul "github.com/kitex-contrib/registry-consul"
+	"sync"
+)
+
+var (
+	UserClient userservice.Client
+
+	once sync.Once // 保证只初始化一次
+)
+
+func Init() {
+	once.Do(func() {
+		initUserClient()
+	})
+}
+
+func initUserClient() {
+
+	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
+	frontendUtils.MustHandleError(err)
+
+	UserClient, err = userservice.NewClient("user", client.WithResolver(r))
+
+	frontendUtils.MustHandleError(err)
+}
+```
+
+user/main.go
+
+```go
+func kitexInit() (opts []server.Option) {
+	// address
+	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
+	if err != nil {
+		panic(err)
+	}
+	opts = append(opts, server.WithServiceAddr(addr))
+
+	// service info
+	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
+		ServiceName: conf.GetConf().Kitex.Service,
+	}))
+
+	r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
+	if err != nil {
+		klog.Fatal(err)
+	}
+	opts = append(opts, server.WithRegistry(r))
+
+	return
+}
+```
+
+### 问题3：
+
+其实视频中有个行为很不正确。就是很多路径都是手动输入，很容易导致错误，尽量复制粘贴。
+
+我就把biz-demo打错成biz-domo。导致依赖一直报错，找了很久
+
+
+
+Makefile
+
+```makefile
+gen-frontend:
+	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/home.proto --service frontend --module github.com/cloudwego/biz-demo/gomall/app/frontend -I ../../idl
+
+
+gen_rpc:
+	@cd rpc_gen && cwgo client --type RPC --service user --module github.com/cloudwego/biz-demo/gomall/rpc_gen --I ../idl --idl ../idl/user.proto
+
+gen_app_user:
+	@cd app/user && cwgo server --type RPC --service user --module github.com/cloudwego/biz-demo/gomall/app/user --pass "-use github.com/cloudwego/biz-demo/gomall/rpc_gen/kitex_gen" -I ../../idl --idl ../../idl/user.proto
+
+```
+
+### 问题4
+
+我是使用wsl2作为开发环境。那我是怎么在windows浏览器下查看的页面
+
+wsl输入。inet addr后面是wsl地址
+
+```
+ifconfig eth0
+
+例如：inet x.x.x.x
+```
+
+使用x.x.x.x:8080即可打开前端页面ifconfig eth0
+
+### 问题5：cannot use math.MaxInt64
+
+golang的版本是不是安的32位的，换成64位就好了
+

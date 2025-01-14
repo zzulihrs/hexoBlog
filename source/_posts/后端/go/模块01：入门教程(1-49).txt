@@ -1,0 +1,1032 @@
+### 字符串应用
+
+
+
+#### 字符串长度计算
+
+ASCII字符使用`len()`函数
+
+**Unicode字符串长度使用`utf8.RuneCountInString()`函数**
+
+
+
+~~~go
+  //如何计算字符串的长度
+    str3 := "hello"
+    str4 := "你好"
+    fmt.Println(len(str3))  // 1个字母占1个字节
+    fmt.Println(len(str4))  // 1个中文占3个字节，go从底层支持utf8
+    fmt.Println(utf8.RuneCountInString(str4)) // 2
+~~~
+
+
+
+#### 字符串拼接
+
+除了使用`+`进行字符串拼接，我们也可以使用`WriteString()`
+
+~~~go
+	str1 := "你好,"
+	str2 := "ms的go教程"
+	var stringBuilder bytes.Buffer
+	//节省内存分配，提高处理效率
+	stringBuilder.WriteString(str1)
+	stringBuilder.WriteString(str2)
+	fmt.Println(stringBuilder.String())
+~~~
+
+#### rune类型索引
+
+直接索引对rune类型无效，可以使用string方法转换
+
+~~~go
+string([]rune(str6)[0])
+~~~
+
+~~~go
+var myStr01 string = "hello,码神的go教程"
+fmt.Println(string([]rune(myStr01)[6]))
+~~~
+
+#### 不同类型字符集遍历
+
+unicode字符集使用`for range`进行遍历，ascii字符集可以使用`for range`或者`for`循环遍历
+
+~~~go
+	var str1 string = "hello"
+	var str2 string = "hello,码神的go教程"
+	// 遍历
+	for i :=0; i< len(str1); i++{
+		fmt.Printf("ascii: %c %d\n", str1[i], str1[i])
+	}
+	for _, s := range  str1{
+		fmt.Printf("unicode: %c %d\n ", s, s)
+	}
+	// 中文只能用 for range
+	for _, s := range  str2{
+		fmt.Printf("unicode: %c %d\n ", s, s)
+	}
+~~~
+
+#### 字符串查找
+
+如何获取字符串中的某一段字符?
+
+* strings.Index()： 正向搜索子字符串
+* strings.LastIndex()：反向搜索子字符串
+
+
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	// 查找
+	tracer := "张三来了,张三bye bye"
+
+	// 正向搜索字符串
+	comma := strings.Index(tracer, ",")
+	fmt.Println(",所在的位置:",comma)
+	fmt.Println(tracer[comma+1:])  // 张三bye bye
+
+	add := strings.Index(tracer, "+")
+	fmt.Println("+所在的位置:",add)  // +所在的位置: -1
+
+	pos := strings.Index(tracer[comma:], "张三")
+	fmt.Println("张三，所在的位置", pos) // 张三，所在的位置 1
+
+	fmt.Println(comma, pos, tracer[5+pos:])  // 12 1 张三bye bye
+}
+
+```
+
+
+### 输出
+
+%c  单一字符
+%T  动态类型
+%v  本来值的输出
+%+v 字段名+值打印
+%d  十进制打印数字
+%p  指针，十六进制
+%f  浮点数
+%b 二进制
+%s string
+
+
+
+### 类型转换
+
+由于Go语言不存在隐式类型转换，因此所有的类型转换都必须显式的声明：
+
+~~~go
+//类型 B 的值 = 类型 B(类型 A 的值)
+valueOfTypeB = type B(valueOfTypeA)
+~~~
+
+示例：
+
+~~~go
+a := 5.0
+b := int(a)
+~~~
+
+#### 修改字符串
+
+Golang语言的字符串是`不可变的`
+
+修改字符串时，可以将字符串`转换为[]byte`进行修改
+
+**[]byte和string可以通过强制类型转换**
+
+> 案例：将8080改为8081
+
+~~~go
+package main
+
+import "fmt"
+
+func main() {
+
+	s1 := "localhost:8080"
+	fmt.Println(s1)
+	// 强制类型转换 string to byte
+	strByte := []byte(s1)
+
+	// 下标修改
+	strByte[len(s1)-1] = '1'
+	fmt.Println(strByte)
+
+	// 强制类型转换 []byte to string
+	s2 := string(strByte)
+	fmt.Println(s2)
+}
+
+~~~
+
+### 类型别名
+
+> 类型别名是 Go 1.9 版本添加的新功能，主要用于解决代码升级、迁移中存在的类型兼容性问题。
+
+格式：
+
+~~~go
+//TypeAlias 只是 Type 的别名，本质上 TypeAlias 与 Type 是同一个类型，就像一个孩子小时候有小名、乳名，上学后用学名，英语老师又会给他起英文名，但这些名字都指的是他本人。
+type TypeAlias = Type
+~~~
+
+还有一种是类型定义：
+
+~~~go
+//定义Name为Type类型 ,定义之后 Name为一种新的类型
+type Name Type
+~~~
+
+```go
+package main
+import (
+    "fmt"
+)
+// 将NewInt定义为int类型
+type NewInt int
+// 将int取一个别名叫IntAlias
+type IntAlias = int
+func main() {
+    // 将a声明为NewInt类型
+    var a NewInt
+    // 查看a的类型名 main.NewInt
+    fmt.Printf("a type: %T\n", a)
+    // 将a2声明为IntAlias类型
+    var a2 IntAlias
+    // 查看a2的类型名 int 
+    //IntAlias 类型只会在代码中存在，编译完成时，不会有 IntAlias 类型。
+    fmt.Printf("a2 type: %T\n", a2)
+}
+```
+
+#### 字符串与其他数据类型的转换:star:
+
+1. #### 整数 与 字符串
+
+   ~~~go
+   // 字符串与其他类型的转换
+   // str 转 int
+   newStr1 := "1"
+   intValue, _ := strconv.Atoi(newStr1)
+   fmt.Printf("%T,%d\n", intValue, intValue)  // int,1
+   
+   // int 转 str
+   intValue2 := 1
+   strValue := strconv.Itoa(intValue2)
+   fmt.Printf("%T, %s\n", strValue, strValue)
+   ~~~
+
+2. #### 浮点数 与字符串
+
+   ~~~java
+       // str 转  float
+       string3 := "3.1415926"
+       f,_ := strconv.ParseFloat(string3, 32)
+       fmt.Printf("%T, %f\n", f, f)  // float64, 3.141593
+       //float 转 string
+   	floatValue := 3.1415926
+   	//4个参数，1：要转换的浮点数 2. 格式标记（b、e、E、f、g、G）
+   	//3. 精度 4. 指定浮点类型（32:float32、64:float64）
+   	// 格式标记：
+   	// ‘b’ (-ddddp±ddd，二进制指数)
+   	// ‘e’ (-d.dddde±dd，十进制指数)
+   	// ‘E’ (-d.ddddE±dd，十进制指数)
+   	// ‘f’ (-ddd.dddd，没有指数)
+   	// ‘g’ (‘e’:大指数，‘f’:其它情况)
+   	// ‘G’ (‘E’:大指数，‘f’:其它情况)
+   	//
+   	// 如果格式标记为 ‘e’，‘E’和’f’，则 prec 表示小数点后的数字位数
+   	// 如果格式标记为 ‘g’，‘G’，则 prec 表示总的数字位数（整数部分+小数部分）
+   	formatFloat := strconv.FormatFloat(floatValue, 'f', 2, 64)
+   	fmt.Printf("%T,%s",formatFloat,formatFloat)
+   ~~~
+
+### 数组
+
+
+
+#### 数组声明
+
+```go
+var 数组变量名 [元素数量]Type
+//默认数组中的值是类型的默认值
+var arr [3]int
+
+a := [2]int{1, 2}
+b := [...]int{1, 2} //如果不写数据数量，而使用...，表示数组的长度是根据初始化值的个数来计算
+c := [2]int{1, 3}
+
+//2 给索引为2的赋值 ，所以结果是 0,0,3
+arr := [3]int{2:3}
+
+type arr3 [3]int
+//这样每次用arr3 代替[3]int，注意前面学过 定义一个类型后 arr3就是一个新的类型
+var arr arr3
+
+数组比较
+fmt.Println(a == b, a == c, b == c) // "true false false"
+d := [3]int{1, 2}
+fmt.Println(a == d) // 编译错误：无法比较 [2]int == [3]int
+```
+
+#### 数组遍历
+
+for range获取
+
+```go
+for index,value := range arr{
+		fmt.Printf("索引:%d,值：%d \n",index,value)
+}
+```
+
+#### 多维数组
+
+声明多维数组的语法如下所示：
+
+~~~go
+//array_name 为数组的名字，array_type 为数组的类型，size1、size2 等等为数组每一维度的长度。
+var array_name [size1][size2]...[sizen] array_type
+~~~
+
+二维数组是最简单的多维数组，二维数组本质上是由多个一维数组组成的。
+
+~~~go
+// 声明一个二维整型数组，两个维度的长度分别是 4 和 2
+var array [4][2]int
+// 使用数组字面量来声明并初始化一个二维整型数组
+array = [4][2]int{{10, 11}, {20, 21}, {30, 31}, {40, 41}}
+// 声明并初始化数组中索引为 1 和 3 的元素
+array = [4][2]int{1: {20, 21}, 3: {40, 41}}
+// 声明并初始化数组中指定的元素
+array = [4][2]int{1: {0: 20}, 3: {1: 41}}
+~~~
+
+### 切片:star: 
+
+`切片（Slice）`与数组一样，也是可以容纳若干类型相同的元素的容器。
+
+与数组不同的是，无法通过切片类型来确定其值的长度。
+
+`切片（slice）`是对数组的一个连续片段的引用，所以切片是一个引用类型。
+
+
+
+> 切片和数组密不可分，如果将数组理解为一栋办公楼，那么切片就是把不同的连续楼层出租给使用者，出租的过程需要选择开始楼层和结束楼层，这个过程就会生成切片
+
+#### 切片类型声明
+
+除了可以从原有的数组或者切片中生成切片外，也可以`声明一个新的切片`，`每一种类型都可以拥有其切片类型`，表示多个相同类型元素的连续集合。
+
+~~~go
+//name 表示切片的变量名，Type 表示切片对应的元素类型。
+var name []Type
+~~~
+
+~~~go
+// 声明字符串切片
+var strList []string
+// 声明整型切片
+var numList []int
+// 声明一个空切片
+var numListEmpty = []int{}
+// 输出3个切片
+fmt.Println(strList, numList, numListEmpty)
+// 输出3个切片大小
+fmt.Println(len(strList), len(numList), len(numListEmpty))
+// 切片判定空的结果
+fmt.Println(strList == nil)
+fmt.Println(numList == nil)
+fmt.Println(numListEmpty == nil)
+~~~
+
+**切片是动态结构，只能与 nil 判定相等，不能互相判定相等。声明新的切片后，可以使用 append() 函数向切片中添加元素。**
+
+
+
+#### 使用 make() 函数构造切片
+
+
+
+~~~go
+make( []Type, size, cap )
+~~~
+
+`Type` 是指切片的元素类型，`size` 指的是为这个类型分配多少个元素，`cap `为预分配的元素数量，这个值设定后不影响 size，只是能提前分配空间，`降低多次分配空间造成的性能问题`。
+
+
+
+#### 切片的cap大小
+
+```go
+var numbers4 = [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+myslice := numbers4[4:6]
+//这打印出来长度为2
+fmt.Printf("myslice为 %d, 其长度为: %d\n", myslice, len(myslice))
+myslice = myslice[:cap(myslice)]
+//为什么 myslice 的长度为2，却能访问到第四个元素
+// 因为cap(mylice)是6，是根据切的数组第四个元素后面的大小决定的
+fmt.Printf("myslice的第四个元素为: %d", myslice[3])
+```
+
+
+
+#### 切片复制
+
+ 使用 `copy` 函数
+
+Go 语言标准库中提供了一个 `copy` 函数，用于在两个切片之间复制元素。`copy` 函数的使用方式如下：
+
+```go
+func copy(dst, src []Type) int
+```
+
+- `dst` 是目标切片，即要复制到的切片.
+- `src` 是源切片，即要复制的切片.
+- 返回值是实际复制的元素数量.
+
+`copy` 函数会将 `src` 中的元素复制到 `dst` 中，复制的元素数量是 `src` 和 `dst` 长度的最小值。如果 `dst` 的容量不足以容纳 `src` 的所有元素，那么只会复制 `dst` 能容纳的部分。
+
+**示例代码**：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    src := []int{1, 2, 3, 4, 5}
+    dst := make([]int, 3) // 创建一个长度为3的切片
+
+    n := copy(dst, src)
+    fmt.Println("Copied elements:", n)
+    fmt.Println("Destination slice:", dst)
+}
+```
+
+输出：
+
+```text
+Copied elements: 3
+Destination slice: [1 2 3]
+```
+
+**注意事项**
+
+- **性能考虑**：使用 `copy` 函数进行切片复制时，复制的元素数量是 `src` 和 `dst` 长度的最小值，因此如果 `dst` 的长度较小，可能需要先调整 `dst` 的长度或容量.
+- **内存使用**：复制切片会创建新的内存分配，因此在处理大量数据时，需要注意内存的使用情况，避免不必要的内存浪费.
+- **引用共享**：切片是基于数组的，如果两个切片共享同一个底层数组，那么对其中一个切片的修改可能会影响另一个切片的内容. 因此，在复制切片时，确保复制后的切片不共享底层数组是一个重要的考虑因素.
+
+### map
+
+map 是引用类型，可以使用如下方式声明：
+
+~~~go
+//[keytype] 和 valuetype 之间允许有空格。
+var mapname map[keytype]valuetype
+~~~
+
+其中：
+
+- mapname 为 map 的变量名。
+- keytype 为键类型。
+- valuetype 是键对应的值类型。
+
+> 在声明的时候不需要知道 map 的长度，因为 map 是可以动态增长的，未初始化的 map 的值是 nil，使用函数 len() 可以获取 map 中 键值对的数目。
+
+```go
+package main
+import "fmt"
+func main() {
+    var mapLit map[string]int
+    var mapAssigned map[string]int
+    mapLit = map[string]int{"one": 1, "two": 2}
+    mapAssigned = mapLit
+    //mapAssigned 是 mapList 的引用，对 mapAssigned 的修改也会影响到 mapList 的值。
+    mapAssigned["two"] = 3
+    fmt.Printf("Map literal at \"one\" is: %d\n", mapLit["one"])
+    fmt.Printf("Map assigned at \"two\" is: %d\n", mapLit["two"])
+    fmt.Printf("Map literal at \"ten\" is: %d\n", mapLit["ten"])
+}
+```
+
+#### **map的另外一种创建方式：**
+
+~~~go
+make(map[keytype]valuetype)
+~~~
+
+**切记不要使用new创建map，否则会得到一个空引用的指针**
+
+map 可以根据新增的 key-value 动态的伸缩，因此它不存在固定长度或者最大限制，但是也可以选择标明 map 的初始容量 capacity，格式如下：
+
+~~~go
+make(map[keytype]valuetype, cap)
+~~~
+
+例如：
+
+~~~go
+map2 := make(map[string]int, 100)
+~~~
+
+`当 map 增长到容量上限的时候，如果再增加新的 key-value，map 的大小会自动加 1，所以出于性能的考虑，对于大的 map 或者会快速扩张的 map，即使只是大概知道容量，也最好先标明。`
+
+**既然一个 key 只能对应一个 value，而 value 又是一个原始类型，那么如果一个 key 要对应多个值怎么办？**
+
+答案是：使用`切片`
+
+通过将 value 定义为 []int 类型或者其他类型的切片，就可以优雅的解决这个问题，示例代码如下所示：
+
+~~~go
+mp1 := make(map[int][]int)
+mp2 := make(map[int]*[]int)
+~~~
+
+#### map遍历
+
+map 的遍历过程使用 for range 循环完成，代码如下：
+
+~~~go
+scene := make(map[string]int)
+scene["cat"] = 66
+scene["dog"] = 4
+scene["pig"] = 960
+for k, v := range scene {
+    fmt.Println(k, v)
+}
+~~~
+
+**注意：map是无序的，不要期望 map 在遍历时返回某种期望顺序的结果**
+
+#### map删除
+
+使用 delete() 内建函数从 map 中删除一组键值对，delete() 函数的格式如下：
+
+~~~go
+delete(map, 键)
+~~~
+
+map 为要删除的 map 实例，键为要删除的 map 中键值对的键。
+
+~~~go
+scene := make(map[string]int)
+// 准备map数据
+scene["cat"] = 66
+scene["dog"] = 4
+scene["pig"] = 960
+delete(scene, "dog")
+for k, v := range scene {
+    fmt.Println(k, v)
+}
+~~~
+
+#### map清空
+
+**Go语言中并没有为 map 提供任何清空所有元素的函数、方法，清空 map 的唯一办法就是重新 make 一个新的 map，不用担心垃圾回收的效率，Go语言中的并行垃圾回收效率比写一个清空函数要高效的多。**
+
+```go
+    m = make(map[string]int) // 创建一个新的空map并赋值给m
+for k := range m { 
+        delete(m, k)
+    }
+```
+
+####  线程安全的map:star:
+
+**注意map 在并发情况下，只读是线程安全的，同时读写是线程不安全的。**
+
+需要并发读写时，一般的做法是加锁，但这样性能并不高，Go语言在 1.9 版本中提供了一种效率较高的并发安全的 `sync.Map`，sync.Map 和 map 不同，不是以语言原生形态提供，而是在 sync 包下的特殊结构。
+
+sync.Map 有以下特性：
+
+- 无须初始化，直接声明即可。
+- sync.Map 不能使用 map 的方式进行取值和设置等操作，而是使用 sync.Map 的方法进行调用，Store 表示存储，Load 表示获取，Delete 表示删除。
+- 使用 Range 配合一个回调函数进行遍历操作，通过回调函数返回内部遍历出来的值，Range 参数中回调函数的返回值在需要继续迭代遍历时，返回 true，终止迭代遍历时，返回 false。
+
+~~~go
+package main
+import (
+      "fmt"
+      "sync"
+)
+func main() {
+    //sync.Map 不能使用 make 创建
+    var scene sync.Map
+    // 将键值对保存到sync.Map
+    //sync.Map 将键和值以 interface{} 类型进行保存。
+    scene.Store("greece", 97)
+    scene.Store("london", 100)
+    scene.Store("egypt", 200)
+    // 从sync.Map中根据键取值
+    fmt.Println(scene.Load("london"))
+    // 根据键删除对应的键值对
+    scene.Delete("london")
+    // 遍历所有sync.Map中的键值对
+    //遍历需要提供一个匿名函数，参数为 k、v，类型为 interface{}，每次 Range() 在遍历一个元素时，都会调用这个匿名函数把结果返回。
+    scene.Range(func(k, v interface{}) bool {
+        fmt.Println("iterate:", k, v)
+        return true
+    })
+}
+~~~
+
+**sync.Map 为了保证并发安全有一些性能损失，因此在非并发情况下，使用 map 相比使用 sync.Map 会有更好的性能。**
+
+###  nil
+
+在Go语言中，布尔类型的零值（初始值）为 false，数值类型的零值为 0，字符串类型的零值为空字符串`""`，而指针、切片、映射、通道、函数和接口的零值则是 nil。
+
+nil和其他语言的null是不同的。
+
+**nil 标识符是不能比较的**
+
+**不同类型 nil 的指针是一样的**
+
+~~~go
+package main
+import (
+    "fmt"
+)
+func main() {
+    var arr []int
+    var num *int
+    fmt.Printf("%p\n", arr)
+    fmt.Printf("%p", num)
+}
+~~~
+
+**nil 是 map、slice、pointer、channel、func、interface 的零值**
+
+~~~go
+package main
+import (
+    "fmt"
+)
+func main() {
+    var m map[int]string
+    var ptr *int
+    var c chan int
+    var sl []int
+    var f func()
+    var i interface{}
+    fmt.Printf("%#v\n", m)
+    fmt.Printf("%#v\n", ptr)
+    fmt.Printf("%#v\n", c)
+    fmt.Printf("%#v\n", sl)
+    fmt.Printf("%#v\n", f)
+    fmt.Printf("%#v\n", i)
+}
+~~~
+
+**零值是Go语言中变量在声明之后但是未初始化被赋予的该类型的一个默认值。**
+
+**不同类型的 nil 值占用的内存大小可能是不一样的**
+
+~~~go
+package main
+import (
+    "fmt"
+    "unsafe"
+)
+func main() {
+    var p *struct{}
+    fmt.Println( unsafe.Sizeof( p ) ) // 8
+    var s []int
+    fmt.Println( unsafe.Sizeof( s ) ) // 24
+    var m map[int]bool
+    fmt.Println( unsafe.Sizeof( m ) ) // 8
+    var c chan string
+    fmt.Println( unsafe.Sizeof( c ) ) // 8
+    var f func()
+    fmt.Println( unsafe.Sizeof( f ) ) // 8
+    var i interface{}
+    fmt.Println( unsafe.Sizeof( i ) ) // 16
+}
+~~~
+
+**具体的大小取决于编译器和架构**
+
+### new和make
+
+make 关键字的主要作用是创建 slice、map 和 Channel 等内置的数据结构，而 new 的主要作用是为类型申请一片内存空间，并返回指向这片内存的指针。
+
+1. make 分配空间后，会进行初始化，new分配的空间被清零
+2. new 分配返回的是指针，即类型 *Type。make 返回引用，即 Type；
+3. new 可以分配任意类型的数据；
+
+### **不定参数传值**
+
+不定参数传值 就是函数的参数不是固定的，后面的类型是固定的。（可变参数）
+
+Golang 可变参数本质上就是 slice。只能有一个，且必须是最后一个。
+
+在参数赋值时可以不用用一个一个的赋值，可以直接传递一个数组或者切片。
+
+格式:
+
+~~~go
+  func myfunc(args ...int) {    //0个或多个参数
+  }
+
+  func add(a int, args…int) int {    //1个或多个参数
+  }
+
+  func add(a int, b int, args…int) int {    //2个或多个参数
+  }
+~~~
+
+**注意：其中args是一个slice，我们可以通过arg[index]依次访问所有参数,通过len(arg)来判断传递参数的个数.**
+
+### 闭包
+
+> 所谓“闭包”，指的是一个拥有许多变量和绑定了这些变量的环境的表达式（通常是一个函数），因而这些变量也是该表达式的一部分。
+>
+> 闭包=函数+引用环境
+
+示例：
+
+- **引用外部变量**：闭包可以访问在其外部定义的变量，即使这些变量在函数外部定义。
+- **保持变量状态**：由于闭包可以访问外部变量，因此可以在多次调用之间保持变量的状态。
+
+```go
+package main
+import (
+	"fmt"
+)
+// 创建一个玩家生成器, 输入名称, 输出生成器
+func playerGen(name string) func() (string, int) {
+	// 血量一直为150
+	hp := 150
+	// 返回创建的闭包
+	return func() (string, int) {
+		// 将变量引用到闭包中
+		return name, hp
+	}
+}
+
+// 创建一个玩家生成器, 输入名称, 输出生成器
+func playerGen1() func(string) (string, int) {
+	// 血量一直为150
+	hp := 150
+	// 返回创建的闭包
+	return func(name string) (string, int) {
+		// 将变量引用到闭包中
+		return name, hp
+	}
+}
+func main() {
+	// 创建一个玩家生成器
+	generator := playerGen("ms")
+	// 返回玩家的名字和血量
+	name, hp := generator()
+	// 打印值
+	fmt.Println(name, hp)
+
+	generator1 := playerGen1()
+	name1,hp1 := generator1("ms")
+	// 打印值
+	fmt.Println(name1, hp1)
+}
+```
+
+### defer延迟调用
+
+> Go语言的 defer 语句会将其后面跟随的语句进行延迟处理
+
+ **defer特性:**
+
+1. 关键字 defer 用于注册延迟调用。
+2. 这些调用直到 return 前才被执。因此，可以用来做资源清理。
+3. 多个defer语句，按先进后出的方式执行。
+4. defer语句中的变量，在defer声明时就决定了。
+
+**defer的用途：**
+
+1. 关闭文件句柄
+2. 锁资源释放
+3. 数据库连接释放
+
+**go 语言的defer功能强大，对于资源管理非常方便，但是如果没用好，也会有陷阱。**
+
+~~~go
+package main
+
+import "fmt"
+
+func main() {
+	var whatever = [5]int{1,2,3,4,5}
+
+	for i := range whatever {
+		defer fmt.Println(i)
+	}
+}
+~~~
+
+看下面的示例：
+
+~~~go
+package main
+
+import (
+	"log"
+	"time"
+)
+
+func main() {
+	start := time.Now()
+	log.Printf("开始时间为：%v", start)
+  defer log.Printf("时间差：%v", time.Since(start))  // Now()此时已经copy进去了
+    //不受这3秒睡眠的影响
+	time.Sleep(3 * time.Second)
+
+	log.Printf("函数结束")
+}
+~~~
+
+* Go 语言中所有的`函数调用都是传值的`
+* 调用 defer 关键字会`立刻拷贝函数中引用的外部参数` ，包括start 和time.Since中的Now
+* defer的函数在`压栈的时候也会保存参数的值，并非在执行时取值`。
+
+如何解决上述问题：使用defer fun()
+
+~~~go
+package main
+
+import (
+	"log"
+	"time"
+)
+
+func main() {
+	start := time.Now()
+	log.Printf("开始时间为：%v", start)
+	defer func() {
+		log.Printf("开始调用defer")
+		log.Printf("时间差：%v", time.Since(start))
+		log.Printf("结束调用defer")
+	}()
+	time.Sleep(3 * time.Second)
+
+	log.Printf("函数结束")
+}
+~~~
+
+**因为拷贝的是`函数指针`,函数属于引用传递**
+
+在来看一个问题：
+
+~~~go
+package main
+
+import "fmt"
+
+func main() {
+	var whatever = [5]int{1,2,3,4,5}
+	for i,_ := range whatever {
+        //函数正常执行,由于闭包用到的变量 i 在执行的时候已经变成4,所以输出全都是4.
+		defer func() { fmt.Println(i) }()
+	}
+}
+~~~
+
+怎么解决：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var whatever = [5]int{1,2,3,4,5}
+	for i,_ := range whatever {
+		i := i
+		defer func() { fmt.Println(i) }()
+	}
+}
+```
+
+### 异常处理
+
+> Go语言中使用 panic 抛出错误，recover 捕获错误。
+
+异常的使用场景简单描述：Go中可以抛出一个panic的异常，然后在defer中通过recover捕获这个异常，然后正常处理。
+
+异常的使用场景简单描述：Go中可以抛出一个panic的异常，然后在defer中通过recover捕获这个异常，然后正常处理。
+
+#### **panic：**
+
+1. 内置函数
+2. 假如函数F中书写了panic语句，会终止其后要执行的代码，在panic所在函数F内如果存在要执行的defer函数列表，按照defer的逆序执行
+3. 返回函数F的调用者G，在G中，调用函数F语句之后的代码不会执行，假如函数G中存在要执行的defer函数列表，按照defer的逆序执行
+4. 直到goroutine整个退出，并报告错误
+
+#### **recover：**
+
+1. 内置函数
+2. 用来捕获panic，从而影响应用的行为
+
+> golang 的错误处理流程：当一个函数在执行过程中出现了异常或遇到 panic()，正常语句就会立即终止，然后执行 defer 语句，再报告异常信息，最后退出 goroutine。如果在 defer 中使用了 recover() 函数,则会捕获错误信息，使该错误信息终止报告。
+
+**注意:**
+
+1. 利用recover处理panic指令，defer 必须放在 panic 之前定义，另外 recover 只有在 defer 调用的函数中才有效。否则当panic时，recover无法捕获到panic，无法防止panic扩散。
+2. recover 处理异常后，逻辑并不会恢复到 panic 那个点去，函数跑到 defer 之后的那个点。
+3. 多个 defer 会形成 defer 栈，后定义的 defer 语句会被最先调用。
+
+~~~go
+package main
+
+func main() {
+    test()
+}
+
+func test() {
+    defer func() {
+        if err := recover(); err != nil {
+            println(err.(string)) // 将 interface{} 转型为具体类型。
+        }
+    }()
+
+    panic("panic error!")
+}
+~~~
+
+由于 panic、recover 参数类型为 interface{}，因此可抛出任何类型对象。
+
+~~~go
+ func panic(v interface{})
+ func recover() interface{}
+~~~
+
+**延迟调用中引发的错误，可被后续延迟调用捕获，但仅最后一个错误可被捕获:**
+
+~~~go
+package main
+
+import "fmt"
+
+func test() {
+    defer func() {
+        // defer panic 会打印
+        fmt.Println(recover())
+    }()
+
+    defer func() {
+        panic("defer panic")
+    }()
+
+    panic("test panic")
+}
+
+func main() {
+    test()
+}
+~~~
+
+**如果需要保护代码段，可将代码块重构成匿名函数，如此可确保后续代码被执 ：**
+
+~~~go
+package main
+
+import "fmt"
+
+func test(x, y int) {
+    var z int
+
+    func() {
+        defer func() {
+            if recover() != nil {
+                z = 0
+            }
+        }()
+        panic("test panic")
+        z = x / y
+        return
+    }()
+
+    fmt.Printf("x / y = %d\n", z)
+}
+
+func main() {
+    test(2, 1)
+}
+~~~
+
+**除用 panic 引发中断性错误外，还可返回 error 类型错误对象来表示函数调用状态:**
+
+~~~go
+type error interface {
+    Error() string
+}
+~~~
+
+标准库 `errors.New` 和 `fmt.Errorf `函数用于创建实现 error 接口的错误对象。通过判断错误对象实例来确定具体错误类型。
+
+~~~go
+package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+var ErrDivByZero = errors.New("division by zero")
+
+func div(x, y int) (int, error) {
+    if y == 0 {
+        return 0, ErrDivByZero
+    }
+    return x / y, nil
+}
+
+func main() {
+    defer func() {
+        fmt.Println(recover())
+    }()
+    switch z, err := div(10, 0); err {
+    case nil:
+        println(z)
+    case ErrDivByZero:
+        panic(err)
+    }
+}
+~~~
+
+**Go实现类似 try catch 的异常处理:**
+
+~~~go
+package main
+
+import "fmt"
+
+func Try(fun func(), handler func(interface{})) {
+    defer func() {
+        if err := recover(); err != nil {
+            handler(err)
+        }
+    }()
+    fun()
+}
+
+func main() {
+    Try(func() {
+        panic("test panic")
+    }, func(err interface{}) {
+        fmt.Println(err)
+    })
+}
+~~~
+
+**如何区别使用 panic 和 error 两种方式?**
+
+惯例是:导致关键流程出现不可修复性错误的使用 panic，其他使用 error。

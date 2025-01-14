@@ -1,0 +1,1009 @@
+### 结构体
+
+结构体的定义只是一种内存布局的描述，只有当结构体实例化时，才会真正地分配内存
+
+#### 结构体实例化
+
+实例化就是根据结构体定义的格式创建一份与格式一致的内存区域，结构体实例与实例间的内存是完全独立的。
+
+**基本的实例化形式:**
+
+结构体本身是一种类型，可以像整型、字符串等类型一样，以 var 的方式声明结构体即可完成实例化。
+
+~~~go
+var ins T
+~~~
+
+`T `为结构体类型，`ins `为结构体的实例
+
+使用.来访问结构体的成员变量,结构体成员变量的赋值方法与普通变量一致
+
+```go
+//可以使用
+var p = Point{
+	X: 1,
+	Y: 2,
+}
+```
+
+#### 创建指针类型的结构体：
+
+Go语言中，还可以使用 new 关键字对类型（包括结构体、整型、浮点数、字符串等）进行实例化，结构体在实例化后会形成指针类型的结构体。
+
+~~~go
+ins := new(T)
+~~~
+
+- T 为类型，可以是结构体、整型、字符串等。
+- ins：T 类型被实例化后保存到 ins 变量中，ins 的类型为 *T，属于指针。
+
+下面的例子定义了一个玩家（Player）的结构，玩家拥有名字、生命值和魔法值：
+
+~~~go
+type Player struct{
+    Name string
+    HealthPoint int
+    MagicPoint int
+}
+tank := new(Player)
+tank.Name = "ms"
+tank.HealthPoint = 300
+~~~
+
+ **new 实例化的结构体实例在成员赋值上与基本实例化的写法一致。**
+
+**取结构体的地址实例化:**
+
+在Go语言中，对结构体进行`&`取地址操作时，视为对该类型进行一次 new 的实例化操作，取地址格式如下：
+
+~~~go
+ins := &T{}
+~~~
+
+其中：
+
+- T 表示结构体类型。
+- ins 为结构体的实例，类型为 *T，是指针类型。
+
+示例：
+
+~~~go
+package main
+
+import "fmt"
+
+type Command struct {
+	Name    string    // 指令名称
+	Var     *int      // 指令绑定的变量
+	Comment string    // 指令的注释
+}
+
+func newCommand(name string, varRef *int, comment string) *Command {
+	return &Command{
+		Name:    name,
+		Var:     varRef,
+		Comment: comment,
+	}
+}
+
+var version = 1
+func main() {
+	cmd := newCommand(
+		"version",
+		&version,
+		"show version",
+	)
+	fmt.Println(cmd)
+}
+
+~~~
+
+#### 匿名结构体
+
+匿名结构体没有类型名称，无须通过 type 关键字定义就可以直接使用。
+
+~~~go
+package main
+import (
+	"fmt"
+)
+// 打印消息类型, 传入匿名结构体
+func printMsgType(msg *struct {
+	id   int
+	data string
+}) {
+	// 使用动词%T打印msg的类型
+	fmt.Printf("%T\n, msg:%v", msg,msg)
+}
+func main() {
+	// 实例化一个匿名结构体
+	msg := &struct {  // 定义部分
+		id   int
+		data string
+	}{  // 值初始化部分
+		1024,
+		"hello",
+	}
+	printMsgType(msg)
+}
+~~~
+
+### 方法
+
+在Go语言中，结构体就像是类的一种`简化形式`，那么类的方法在哪里呢？
+
+在Go语言中有一个概念，它和方法有着同样的名字，并且大体上意思相同，Go 方法是作用在接收器（receiver）上的一个函数，接收器是某种类型的变量，因此方法是一种特殊类型的函数。3
+
+接收器类型可以是（几乎）任何类型，不仅仅是结构体类型，任何类型都可以有方法，甚至可以是函数类型，可以是 int、bool、string 或数组的别名类型，但是接收器不能是一个接口类型，因为接口是一个抽象定义，而方法却是具体实现，如果这样做了就会引发一个编译错误`invalid receiver type…`
+
+接收器也不能是一个指针类型，但是它可以是任何其他允许类型的指针。
+
+**一个类型加上它的方法等价于面向对象中的一个类**
+
+在Go语言中，类型的`代码`和绑定在它上面的`方法`的代码可以`不放置在一起`，它们可以存在不同的源文件中，唯一的要求是它们必须是`同一个包的`。
+
+> 类型 T（或 T）上的所有方法的集合叫做类型 T（或 T）的方法集。
+
+在面向对象的语言中，类拥有的方法一般被理解为类可以做的事情。在Go语言中“方法”的概念与其他语言一致，只是Go语言建立的“接收器”强调方法的作用对象是接收器，也就是类实例，而函数没有作用对象。
+
+**为结构体添加方法：**
+
+> 需求：将物品放入背包
+
+面向对象的写法：
+
+​	将背包做为一个对象，将物品放入背包的过程作为“方法”
+
+~~~go
+package main
+
+import "fmt"
+
+type Bag struct {
+	items []int
+}
+func (b *Bag) Insert(itemid int) {
+	b.items = append(b.items, itemid)
+}
+func main() {
+	b := new(Bag)
+	b.Insert(1001)
+	fmt.Println(b.items)
+}
+~~~
+
+**(b*Bag) 表示接收器，即 Insert 作用的对象实例。每个方法只能有一个接收器**
+
+#### 2.1 接收器
+
+接收器的格式如下：
+
+~~~go
+func (接收器变量 接收器类型) 方法名(参数列表) (返回参数) {
+    函数体
+}
+~~~
+
+- 接收器变量：接收器中的参数变量名在命名时，官方建议使用接收器类型名的第一个小写字母，而不是 self、this 之类的命名。例如，Socket 类型的接收器变量应该命名为 s，Connector 类型的接收器变量应该命名为 c 等。
+- 接收器类型：接收器类型和参数类似，可以是指针类型和非指针类型。
+- 方法名、参数列表、返回参数：格式与函数定义一致。
+
+接收器根据接收器的类型可以分为`指针接收器`、`非指针接收器`，两种接收器在使用时会产生不同的效果，根据效果的不同，两种接收器会被用于不同性能和功能要求的代码中。
+
+#### **指针类型的接收器:**
+
+指针类型的接收器由一个结构体的指针组成，更接近于面向对象中的 this 或者 self。
+
+由于指针的特性，调用方法时，`修改接收器指针的任意成员变量，在方法结束后，修改都是有效的`。
+
+示例：
+
+使用结构体定义一个属性（Property），为属性添加 SetValue() 方法以封装设置属性的过程，通过属性的 Value() 方法可以重新获得属性的数值，使用属性时，通过 SetValue() 方法的调用，可以达成修改属性值的效果：
+
+~~~go
+package main
+import "fmt"
+// 定义属性结构
+type Property struct {
+    value int  // 属性值
+}
+// 设置属性值
+func (p *Property) SetValue(v int) {
+    // 修改p的成员变量
+    p.value = v
+}
+// 取属性值
+func (p *Property) Value() int {
+    return p.value
+}
+func main() {
+    // 实例化属性
+    p := new(Property)
+    // 设置值
+    p.SetValue(100)
+    // 打印值
+    fmt.Println(p.Value())
+}
+~~~
+
+#### **非指针类型的接收器:**
+
+当方法作用于非指针接收器时，Go语言会在代码运行时将接收器的值复制一份，在非指针接收器的方法中可以获取接收器的成员值，但`修改后无效`。
+
+点（Point）使用结构体描述时，为点添加 Add() 方法，这个方法不能修改 Point 的成员 X、Y 变量，而是在计算后返回新的 Point 对象，Point 属于小内存对象，在函数返回值的复制过程中可以极大地提高代码运行效率:
+
+~~~go
+package main
+import (
+    "fmt"
+)
+// 定义点结构
+type Point struct {
+    X int
+    Y int
+}
+// 非指针接收器的加方法
+func (p Point) Add(other Point) Point {
+    // 成员值与参数相加后返回新的结构
+    return Point{p.X + other.X, p.Y + other.Y}
+}
+func main() {
+    // 初始化点
+    p1 := Point{1, 1}
+    p2 := Point{2, 2}
+    // 与另外一个点相加
+    result := p1.Add(p2)
+    // 输出结果
+    fmt.Println(result)
+}
+~~~
+
+**在计算机中，小对象由于值复制时的速度较快，所以适合使用非指针接收器，大对象因为复制性能较低，适合使用指针接收器，在接收器和参数间传递时不进行复制，只是传递指针。**
+
+#### 给任意类型添加方法
+
+Go语言可以对任何类型添加方法，给一种类型添加方法就像给结构体添加方法一样，因为结构体也是一种类型。
+
+**为基本类型添加方法：**
+
+在Go语言中，使用 type 关键字可以定义出新的自定义类型，之后就可以为自定义类型添加各种方法了。我们习惯于使用面向过程的方式判断一个值是否为 0，例如：
+
+~~~go
+if  v == 0 {
+    // v等于0
+}
+~~~
+
+如果将 v 当做整型对象，那么判断 v 值就可以增加一个 IsZero() 方法，通过这个方法就可以判断 v 值是否为 0，例如：
+
+~~~go
+if  v.IsZero() {
+    // v等于0
+}
+~~~
+
+为基本类型添加方法的详细实现流程如下：
+
+~~~go
+package main
+import (
+    "fmt"
+)
+// 将int定义为MyInt类型
+type MyInt int
+// 为MyInt添加IsZero()方法
+func (m MyInt) IsZero() bool {
+    return m == 0
+}
+// 为MyInt添加Add()方法
+func (m MyInt) Add(other int) int {
+    return other + int(m)
+}
+func main() {
+    var b MyInt
+    fmt.Println(b.IsZero())
+    b = 1
+    fmt.Println(b.Add(2))
+}
+~~~
+
+### 接口
+
+
+
+#### 接口定义
+
+每个接口类型由数个方法组成。接口的形式代码如下：
+
+~~~go
+type 接口类型名 interface{
+    方法名1( 参数列表1 ) 返回值列表1
+    方法名2( 参数列表2 ) 返回值列表2
+    …
+}
+~~~
+
+对各个部分的说明：
+
+- 接口类型名：使用 type 将接口定义为自定义的类型名。Go语言的接口在命名时，一般会在单词后面添加 er，如有写操作的接口叫 Writer，有字符串功能的接口叫 Stringer，有关闭功能的接口叫 Closer 等。
+- 方法名：当方法名首字母是大写时，且这个接口类型名首字母也是大写时，这个方法可以被接口所在的包（package）之外的代码访问。
+- 参数列表、返回值列表：参数列表和返回值列表中的参数变量名可以被忽略
+
+~~~go
+type Writer interface{
+    //大写字母开头 意味着别的包 也可以访问
+    Write([]byte) error
+}
+~~~
+
+#### 接口实现条件
+
+如果一个任意类型 T 的方法集为一个接口类型的方法集的超集，则我们说类型 T 实现了此接口类型。
+
+T 可以是一个非接口类型，也可以是一个接口类型。
+
+实现关系在Go语言中是隐式的。两个类型之间的实现关系不需要在代码中显式地表示出来。Go语言中没有类似于 implements 的关键字。 Go编译器将自动在需要的时候检查两个类型之间的实现关系。
+
+接口定义后，需要实现接口，调用方才能正确编译通过并使用接口。
+
+接口的实现需要遵循两条规则才能让接口可用：
+
+1. 接口的方法与实现接口的类型方法格式一致
+
+   > 在类型中添加与接口签名一致的方法就可以实现该方法。
+   >
+   > 签名包括方法中的名称、参数列表、返回参数列表。
+   >
+   > 也就是说，只要实现接口类型中的方法的名称、参数列表、返回参数列表中的任意一项与接口要实现的方法不一致，那么接口的这个方法就不会被实现。
+
+   示例：
+
+   ~~~go
+   package main
+   import (
+       "fmt"
+   )
+   // 定义一个数据写入器
+   type DataWriter interface {
+       WriteData(data interface{}) error
+   }
+   // 定义文件结构，用于实现DataWriter
+   type file struct {
+   }
+   // 实现DataWriter接口的WriteData方法
+   func (d *file) WriteData(data interface{}) error {
+       // 模拟写入数据
+       fmt.Println("WriteData:", data)
+       return nil
+   }
+   func main() {
+       // 实例化file
+       f := new(file)
+       // 声明一个DataWriter的接口
+       var writer DataWriter
+       // 将接口赋值f，也就是*file类型
+       writer = f
+       // 使用DataWriter接口进行数据写入
+       writer.WriteData("data")
+   }
+   ~~~
+
+   **当类型无法实现接口时，编译器会报错：**
+
+   1. 函数名不一致导致的报错
+   2. 实现接口的方法签名不一致导致的报错
+
+   
+
+2. **接口中所有方法均被实现**
+
+   当一个接口中有多个方法时，只有这些方法都被实现了，接口才能被正确编译并使用。
+
+   ~~~go
+   // 定义一个数据写入器
+   type DataWriter interface {
+       WriteData(data interface{}) error
+       // 新增一个方法 能否写入
+       CanWrite() bool
+   }
+   ~~~
+
+   在此运行上述的程序，就会报错：
+
+   ~~~go
+   cannot use f (type *file) as type DataWriter in assignment:
+   	*file does not implement DataWriter (missing CanWrite method)
+   ~~~
+
+   需要在 file 中实现 CanWrite() 方法才能正常使用 DataWriter()。
+
+   Go语言的接口实现是隐式的，无须让实现接口的类型写出实现了哪些接口。
+
+   **这个设计被称为非侵入式设计。**
+
+#### 类型与接口的关系
+
+一个接口的方法，不一定需要由一个类型完全实现，接口的方法可以通过在类型中嵌入其他类型或者结构体来实现。
+
+由于 `haier` 结构体嵌入了 `dryer`，并且 `dryer` 已经实现了 `dry` 方法，因此 `haier` 结构体自动继承了 `dry` 方法。同时，`haier` 也实现了 `wash` 方法。因此，`haier` 结构体完全实现了 `WashingMachine` 接口的所有方法，可以被当作 `WashingMachine` 接口类型来使用。
+
+```go
+// WashingMachine 洗衣机
+type WashingMachine interface {
+    wash()
+    dry()
+}
+
+// 甩干器
+type dryer struct{}
+
+// 实现WashingMachine接口的dry()方法
+func (d dryer) dry() {
+    fmt.Println("甩一甩")
+}
+
+// 海尔洗衣机
+type haier struct {
+    dryer //嵌入甩干器
+}
+
+// 实现WashingMachine接口的wash()方法
+func (h haier) wash() {
+    fmt.Println("洗刷刷")
+}
+```
+
+#### 接口嵌套
+
+接口与接口间可以通过嵌套创造出新的接口
+
+```go
+// Sayer 接口
+type Sayer interface {
+    say()
+}
+
+// Mover 接口
+type Mover interface {
+    move()
+}
+
+// 接口嵌套
+type animal interface {
+    Sayer
+    Mover
+}
+```
+
+嵌套得到的接口的使用与普通接口一样，这里我们让cat实现animal接口：
+
+~~~go
+type cat struct {
+    name string
+}
+
+func (c cat) say() {
+    fmt.Println("喵喵喵")
+}
+
+func (c cat) move() {
+    fmt.Println("猫会动")
+}
+
+func main() {
+    var x animal
+    x = cat{name: "花花"}
+    x.move()
+    x.say()
+}
+~~~
+
+### 空接口
+
+空接口是指没有定义任何方法的接口。
+
+因此任何类型都实现了空接口。
+
+空接口类型的变量可以存储任意类型的变量。
+
+~~~go
+func main() {
+    // 定义一个空接口x
+    var x interface{}
+    s := "ms的go教程"
+    x = s
+    fmt.Printf("type:%T value:%v\n", x, x)
+    i := 100
+    x = i
+    fmt.Printf("type:%T value:%v\n", x, x)
+    b := true
+    x = b
+    fmt.Printf("type:%T value:%v\n", x, x)
+}
+~~~
+
+####  空接口的应用
+
+**空接口作为函数的参数**
+
+使用空接口实现可以接收任意类型的函数参数。
+
+~~~go
+// 空接口作为函数参数
+func show(a interface{}) {
+    fmt.Printf("type:%T value:%v\n", a, a)
+}
+~~~
+
+**空接口作为map的值**
+
+使用空接口实现可以保存任意值的字典。
+
+~~~go
+// 空接口作为map值
+    var studentInfo = make(map[string]interface{})
+    studentInfo["name"] = "李白"
+    studentInfo["age"] = 18
+    studentInfo["married"] = false
+    fmt.Println(studentInfo)
+~~~
+
+
+
+**类型断言**
+
+空接口可以存储任意类型的值，那我们如何获取其存储的具体数据呢？
+
+**接口值**
+
+一个接口的值（简称接口值）是由一个具体类型和具体类型的值两部分组成的。
+
+这两部分分别称为`接口的动态类型`和`动态值`。
+
+想要判断空接口中的值这个时候就可以使用类型断言，其语法格式：
+
+~~~go
+x.(T)
+~~~
+
+其中：
+
+1. x：表示类型为interface{}的变量
+
+2. T：表示断言x可能是的类型。
+
+**该语法返回两个参数，第一个参数是x转化为T类型后的变量，第二个值是一个布尔值，若为true则表示断言成功，为false则表示断言失败。**
+
+   
+
+   ~~~go
+func main() {
+    var x interface{}
+    x = "ms的go教程"
+    v, ok := x.(string)
+    if ok {
+        fmt.Println(v)
+    } else {
+        fmt.Println("类型断言失败")
+    }
+}
+   ~~~
+
+上面的示例中如果要断言多次就需要写多个if判断，这个时候我们可以使用switch语句来实现：
+
+~~~go
+func justifyType(x interface{}) {
+    switch v := x.(type) {
+    case string:
+        fmt.Printf("x is a string，value is %v\n", v)
+    case int:
+        fmt.Printf("x is a int is %v\n", v)
+    case bool:
+        fmt.Printf("x is a bool is %v\n", v)
+    default:
+        fmt.Println("unsupport type！")
+    }
+}
+~~~
+
+因为空接口可以存储任意类型值的特点，所以空接口在Go语言中的使用十分广泛。
+
+> 关于接口需要注意的是，只有当有两个或两个以上的具体类型必须以相同的方式进行处理时才需要定义接口。不要为了接口而写接口，那样只会增加不必要的抽象，导致不必要的运行时损耗。
+
+### I/O操作
+
+#### Reader
+
+Reader接口的定义，Read()方法用于读取数据。
+
+~~~go
+type Reader interface {
+        Read(p []byte) (n int, err error)
+}
+~~~
+
+io.Reader 表示一个读取器，它将数据从某个资源读取到传输缓冲区。在缓冲区中，数据可以被流式传输和使用。
+
+- 对于要用作读取器的类型，它必须实现 io.Reader 接口的唯一一个方法 Read(p []byte)。
+- 换句话说，只要实现了 Read(p []byte) ，那它就是一个读取器。
+- Read() 方法有两个返回值，一个是读取到的字节数，一个是发生错误时的错误。
+
+通过 string.NewReader(string) 创建一个字符串读取器，然后流式地按字节读取：
+
+~~~go
+package main
+
+import (
+	"io"
+	"log"
+	"os"
+	"strings"
+)
+
+func main() {
+
+	reader := strings.NewReader("zhangsan test123 123")
+	// 每次读取4个字节
+	p := make([]byte, 4)
+	for {
+
+		n, err := reader.Read(p)
+		if err != nil {
+			if err == io.EOF {
+				log.Printf("读完了:eof错误 :%d", n)
+				break
+			}
+			log.Printf("其他错误:%v", err)
+			os.Exit(2)
+		}
+		log.Printf("[读取到的字节数为:%d][内容:%v]", n, string(p[:n]))
+	}
+
+}
+~~~
+
+~~~go
+ [读取到的字节数为:4][内容:mszl]
+ [读取到的字节数为:4][内容:u te]
+ [读取到的字节数为:4][内容:st12]
+ [读取到的字节数为:4][内容:3 12]
+ [读取到的字节数为:1][内容:3]
+ 读完了:eof错误 :0
+~~~
+
+* 最后一次返回的 n 值有可能小于缓冲区大小。
+* io.EOF 来表示输入流已经读取到头
+
+strings.Reader.Read方法:
+
+~~~go
+func (r *Reader) Read(b []byte) (n int, err error) {
+	if r.i >= int64(len(r.s)) {
+		return 0, io.EOF
+	}
+	r.prevRune = -1
+	n = copy(b, r.s[r.i:])
+	r.i += int64(n)
+	return
+}
+~~~
+
+##### 文件操作相关API
+
+- ```go
+  func Create(name string) (file *File, err Error)
+  ```
+
+  - 根据提供的文件名创建新的文件，返回一个文件对象，默认权限是0666
+
+- ```go
+  func NewFile(fd uintptr, name string) *File
+  ```
+
+  - 根据文件描述符创建相应的文件，返回一个文件对象
+
+- ```go
+  func Open(name string) (file *File, err Error)
+  ```
+
+  - 只读方式打开一个名称为name的文件
+
+- ```go
+  func OpenFile(name string, flag int, perm uint32) (file *File, err Error)
+  ```
+
+  - 打开名称为name的文件，flag是打开的方式，只读、读写等，perm是权限
+
+- ```go
+  func (file *File) Write(b []byte) (n int, err Error)
+  ```
+
+  - 写入byte类型的信息到文件
+
+- ```go
+  func (file *File) WriteAt(b []byte, off int64) (n int, err Error)
+  ```
+
+  - 在指定位置开始写入byte类型的信息
+
+- ```go
+  func (file *File) WriteString(s string) (ret int, err Error)
+  ```
+
+  - 写入string信息到文件
+
+- ```go
+  func (file *File) Read(b []byte) (n int, err Error)
+  ```
+
+  - 读取数据到b中
+
+- ```go
+  func (file *File) ReadAt(b []byte, off int64) (n int, err Error)
+  ```
+
+  - 从off开始读取数据到b中
+
+- ```go
+  func Remove(name string) Error
+  ```
+
+  - 删除文件名为name的文件
+
+##### 读文件
+
+~~~go
+type Closer interface {
+    Close() error
+}
+~~~
+
+
+
+`os.Open()`函数能够打开一个文件，返回一个`*File`和一个`err`。对得到的文件实例调用`Close()`方法能够关闭文件。
+
+文件读取可以用file.Read()，读到文件末尾会返回io.EOF的错误
+
+~~~go
+package main
+
+import (
+    "fmt"
+    "io"
+    "os"
+)
+
+func main() {
+    // 打开文件
+    file, err := os.Open("./xxx.txt")
+    if err != nil {
+        fmt.Println("open file err :", err)
+        return
+    }
+    defer file.Close()
+    // 定义接收文件读取的字节数组
+    var buf [128]byte
+    var content []byte
+    for {
+        n, err := file.Read(buf[:])
+        if err == io.EOF {
+            // 读取结束
+            break
+        }
+        if err != nil {
+            fmt.Println("read file err ", err)
+            return
+        }
+        content = append(content, buf[:n]...)
+    }
+    fmt.Println(string(content))
+}
+~~~
+
+#### Writer
+
+~~~go
+type Writer interface {
+    //Write() 方法有两个返回值，一个是写入到目标资源的字节数，一个是发生错误时的错误。
+    Write(p []byte) (n int, err error)
+}
+~~~
+
+- io.Writer 表示一个写入器，它从缓冲区读取数据，并将数据写入目标资源。
+- 对于要用作编写器的类型，必须实现 io.Writer 接口的唯一一个方法 Write(p []byte)
+- 同样，只要实现了 Write(p []byte) ，那它就是一个编写器。
+
+写文件：
+
+~~~go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    // 新建文件
+    file, err := os.Create("./test.txt")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer file.Close()
+    for i := 0; i < 5; i++ {
+        file.WriteString("ab\n")
+        file.Write([]byte("cd\n"))
+    }
+}
+~~~
+
+
+
+####  bufio
+
+- bufio包实现了带缓冲区的读写，是对文件读写的封装
+- bufio缓冲写数据
+
+| 模式        | 含义     |
+| ----------- | -------- |
+| os.O_WRONLY | 只写     |
+| os.O_CREATE | 创建文件 |
+| os.O_RDONLY | 只读     |
+| os.O_RDWR   | 读写     |
+| os.O_TRUNC  | 清空     |
+| os.O_APPEND | 追加     |
+
+**bufio读写数据**
+
+~~~go
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "os"
+)
+
+func wr() {
+    // 参数2：打开模式，所有模式d都在上面
+    // 参数3是权限控制
+    // w写 r读 x执行   w  2   r  4   x  1
+    //特殊权限位，拥有者位，同组用户位，其余用户位
+    file, err := os.OpenFile("./xxx.txt", os.O_CREATE|os.O_WRONLY, 0666)
+    if err != nil {
+        return
+    }
+    defer file.Close()
+    // 获取writer对象
+    writer := bufio.NewWriter(file)
+    for i := 0; i < 10; i++ {
+        writer.WriteString("hello\n")
+    }
+    // 刷新缓冲区，强制写出
+    writer.Flush()
+}
+
+func re() {
+    file, err := os.Open("./xxx.txt")
+    if err != nil {
+        return
+    }
+    defer file.Close()
+    reader := bufio.NewReader(file)
+    for {
+        line, _, err := reader.ReadLine()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            return
+        }
+        fmt.Println(string(line))
+    }
+
+}
+
+func main() {
+    re()
+}
+~~~
+
+
+
+####  ioutil工具包
+
+- ioutil库包含在io目录下，它的主要作用是`作为一个工具包`，里面有一些比较实用的函数
+- 比如 `ReadAll(从某个源读取数据)、ReadFile（读取文件内容）、WriteFile（将数据写入文件）、ReadDir（获取目录）`
+
+~~~go
+package main
+
+import (
+   "fmt"
+   "io/ioutil"
+)
+
+func wr() {
+   err := ioutil.WriteFile("./yyy.txt", []byte("ms的go教程"), 0666)
+   if err != nil {
+      fmt.Println(err)
+      return
+   }
+}
+
+func re() {
+   content, err := ioutil.ReadFile("./yyy.txt")
+   if err != nil {
+      fmt.Println(err)
+      return
+   }
+   fmt.Println(string(content))
+}
+
+func main() {
+   re()
+}
+~~~
+
+### 包
+
+包的习惯用法：
+
+- 包名一般是小写的，使用一个简短且有意义的名称。
+- 包名一般要和所在的目录同名，也可以不同，包名中不能包含`- `等特殊符号。
+- 包名为 main 的包为应用程序的入口包，编译不包含 main 包的源码文件时不会得到可执行文件。
+- 一个文件夹下的所有源码文件只能属于同一个包，同样属于同一个包的源码文件不能放在多个文件夹下。
+
+#### 匿名引用格式
+
+在引用某个包时，如果只是希望执行包初始化的 init 函数，而不使用包内部的数据时，可以使用匿名引用格式，如下所示：
+
+~~~go
+import _ "fmt"
+~~~
+
+匿名导入的包与其他方式导入的包一样都会被编译到可执行文件中。
+
+使用标准格式引用包，但是代码中却没有使用包，编译器会报错。如果包中有 init 初始化函数，则通过`import _ "包的路径" `这种方式引用包，仅执行包的初始化函数，即使包没有 init 初始化函数，也不会引发编译器报错。
+
+~~~go
+package main
+import (
+    _ "database/sql"
+    "fmt"
+)
+func main() {
+    fmt.Println("ms的go教程")
+}
+~~~
+
+#### 注意
+
+- 一个包可以有多个 init 函数，包加载时会执行全部的 init 函数，但并不能保证执行顺序，所以不建议在一个包中放入多个 init 函数，将需要初始化的逻辑放到一个 init 函数里面。
+- 包不能出现环形引用的情况，比如包 a 引用了包 b，包 b 引用了包 c，如果包 c 又引用了包 a，则编译不能通过。
+- 包的重复引用是允许的，比如包 a 引用了包 b 和包 c，包 b 和包 c 都引用了包 d。这种场景相当于重复引用了 d，这种情况是允许的，并且 Go 编译器保证包 d 的 init 函数只会执行一次。
+
+#### **使用go get命令下载指定版本的依赖包**
+
+执行`go get `命令，在下载依赖包的同时还可以指定依赖包的版本。
+
+- 运行`go get -u`命令会将项目中的包升级到最新的次要版本或者修订版本；
+- 运行`go get -u=patch`命令会将项目中的包升级到最新的修订版本；
+- 运行`go get [包名]@[版本号]`命令会下载对应包的指定版本或者将对应包升级到指定的版本。
+
+> 提示：`go get [包名]@[版本号]`命令中版本号可以是 x.y.z 的形式，例如 go get foo@v1.2.3，也可以是 git 上的分支或 tag，例如 go get foo@master，还可以是 git 提交时的哈希值，例如 go get foo@e3702bed2。
+
+#### go.mod
+
+1. 在 GOPATH 目录下新建一个目录，并使用`go mod init`初始化生成 go.mod 文件。
+
+   go.mod 文件一旦创建后，它的内容将会被 go toolchain 全面掌控，go toolchain 会在各类命令执行时，比如`go get`、`go build`、`go mod`等修改和维护 go.mod 文件。
+
+   go.mod 提供了 module、require、replace 和 exclude 四个命令：
+
+   - module 语句指定包的名字（路径）；
+   - require 语句指定的依赖项模块；
+   - replace 语句可以替换依赖项模块；
+   - exclude 语句可以忽略依赖项模块。

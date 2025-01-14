@@ -1,0 +1,247 @@
+变量类型
+
+```
+	var a = "initial" // 自动推导变量类型
+	var b, c int = 1, 2
+	var d = true
+	var e float64
+	f := float32(e)
+```
+
+if else
+
+if后面没有()
+
+
+
+for循环
+
+```
+	for { // 死循环
+		fmt.Println("loop")
+		break
+	}
+	for j := 7; j < 9; j++ {
+		fmt.Println(j)
+	}
+```
+
+
+
+switch
+
+```
+	switch a { // 默认break
+	case 1:
+		fmt.Println("one")
+	case 2:
+		fmt.Println("two")
+	case 3:
+		fmt.Println("three")
+	case 4, 5:
+		fmt.Println("four or five")
+	default:
+		fmt.Println("other")
+	}
+```
+
+数组
+
+```
+	var a [5]int
+	a[4] = 100
+	fmt.Println("get:", a[2])
+	fmt.Println("len:", len(a))
+
+	b := [5]int{1, 2, 3, 4, 5}
+	fmt.Println(b)
+
+	var twoD [2][3]int
+```
+
+切片
+
+```
+	// 切片不同于数组，是一个可变长度的数组
+	s := make([]string, 3)
+	s[0] = "a"
+	s[1] = "b"
+	s[2] = "c"
+	fmt.Println("get:", s[2])   // c
+	fmt.Println("len:", len(s)) // 3
+
+	s = append(s, "d")
+	s = append(s, "e", "f")
+	fmt.Println(s) // [a b c d e f]
+
+	c := make([]string, len(s))
+	copy(c, s)
+```
+
+map
+
+```
+m := make(map[string]int) // string key int value
+// golang的map是无序的
+m["one"] = 1
+m["two"] = 2
+fmt.Println(m)           // map[one:1 two:2]
+fmt.Println(len(m))      // 2
+fmt.Println(m["one"])    // 1
+fmt.Println(m["unknow"]) // 0
+
+r, ok := m["unknow"]
+fmt.Println(r, ok) // 0 false
+
+delete(m, "one")
+```
+
+range
+
+```
+	nums := []int{2, 3, 4}
+	sum := 0
+	for i, num := range nums {
+		sum += num
+		if num == 2 {
+			fmt.Println("index:", i, "num:", num) // index: 0 num: 2
+		}
+	}
+```
+
+结构体
+
+```
+type user struct {
+	name     string
+	password string
+}
+	a := user{name: "wang", password: "1024"}
+	b := user{"wang", "1024"}
+```
+
+字符串
+
+```
+	a := "hello"
+	fmt.Println(strings.Contains(a, "ll"))                // 检查字符串a中是否包含子串"ll"，返回true表示包含
+	fmt.Println(strings.Count(a, "l"))                    // 计算字符串a中"l"出现的次数，返回2表示出现了2次
+	fmt.Println(strings.HasPrefix(a, "he"))               // 检查字符串a是否以"he"开头，返回true表示是
+	fmt.Println(strings.HasSuffix(a, "llo"))              // 检查字符串a是否以"llo"结尾，返回true表示是
+	fmt.Println(strings.Index(a, "ll"))                   // 查找子串"ll"在字符串a中第一次出现的位置，返回2表示从索引2开始
+	fmt.Println(strings.Join([]string{"he", "llo"}, "-")) // 将字符串切片["he", "llo"]用"-"连接起来，返回"he-llo"
+	fmt.Println(strings.Repeat(a, 2))                     // 将字符串a重复2次，返回"hellohello"
+	fmt.Println(strings.Replace(a, "e", "E", -1))         // 将字符串a中的所有"e"替换为"E"，返回"hEllo"
+	fmt.Println(strings.Split("a-b-c", "-"))              // 将字符串"a-b-c"按"-"分割成字符串切片，返回["a", "b", "c"]
+	fmt.Println(strings.ToLower(a))                       // 将字符串a中的所有大写字母转换为小写，返回"hello"
+	fmt.Println(strings.ToUpper(a))                       // 将字符串a中的所有小写字母转换为大写，返回"HELLO"
+	fmt.Println(len(a))                                   // 计算字符串a的长度，返回5
+	b := "你好"
+	fmt.Println(len(b)) // 计算字符串b的长度，返回6
+```
+
+json处理
+
+```
+a := userInfo{Name: "wang", Age: 18, Hobby: []string{"Golang", "TypeScript"}}
+	// 定义一个名为a的userInfo类型的变量，并初始化其字段。
+
+	buf, err := json.Marshal(a)
+	if err != nil {
+		panic(err)
+	}
+	// 使用json.Marshal函数将结构体a编码为JSON格式的字节切片buf。如果编码过程中出现错误，程序会panic。
+
+	fmt.Println(buf) // [123 34 78 97...]
+	// 打印字节切片buf的内容，显示为JSON的字节表示。
+
+	fmt.Println(string(buf)) // {"Name":"wang","age":18,"Hobby":["Golang","TypeScript"]}
+	// 将字节切片buf转换为字符串并打印，显示为JSON格式的字符串。
+
+	buf, err = json.MarshalIndent(a, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	// 使用json.MarshalIndent函数将结构体a编码为JSON格式的字节切片buf，并使用制表符"\t"进行美化。如果编码过程中出现错误，程序会panic。
+
+	fmt.Println(string(buf))
+	// 将美化后的字节切片buf转换为字符串并打印，显示为格式化的JSON字符串。
+
+	var b userInfo
+	err = json.Unmarshal(buf, &b)
+	if err != nil {
+		panic(err)
+	}
+	// 使用json.Unmarshal函数将字节切片buf解码回结构体b。如果解码过程中出现错误，程序会panic。
+
+	fmt.Printf("%#v\n", b) // main.userInfo{Name:"wang", Age:18, Hobby:[]string{"Golang", "TypeScript"}}
+	// 使用%#v格式化字符串打印结构体b的内容，显示为结构体的完整类型信息和字段值。
+```
+
+时间处理
+
+```
+now := time.Now()
+fmt.Println(now) // 2022-03-27 18:04:59.433297 +0800 CST m=+0.000087933
+// 获取当前时间并打印，显示为当前日期和时间，包括时区和纳秒。
+
+t := time.Date(2022, 3, 27, 1, 25, 36, 0, time.UTC)
+// 使用time.Date函数创建一个特定的时间，年、月、日、时、分、秒、纳秒和时区都指定，这里时区为UTC。
+
+t2 := time.Date(2022, 3, 27, 2, 30, 36, 0, time.UTC)
+// 创建另一个时间，与t相同日期但不同时间，时区也为UTC。
+
+fmt.Println(t)                                                  // 2022-03-27 01:25:36 +0000 UTC
+// 打印时间t，显示为指定的日期和时间，以及时区。
+
+fmt.Println(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute()) // 2022 March 27 1 25
+// 分别打印时间t的年、月、日、时、分。
+
+fmt.Println(t.Format("2006-01-02 15:04:05"))                    // 2022-03-27 01:25:36
+// 使用t.Format函数将时间t格式化为指定的格式字符串。
+
+diff := t2.Sub(t)
+fmt.Println(diff)                           // 1h5m0s
+// 计算时间t2和t之间的差值，并打印，显示为时间差。
+
+fmt.Println(diff.Minutes(), diff.Seconds()) // 65 3900
+// 分别打印时间差diff的分钟数和秒数。
+
+t3, err := time.Parse("2006-01-02 15:04:05", "2022-03-27 01:25:36")
+if err != nil {
+    panic(err)
+}
+// 使用time.Parse函数解析时间字符串，格式由Go的参考时间确定，这里是"2006-01-02 15:04:05"。
+
+fmt.Println(t3 == t)    // true
+// 比较解析后的时间t3和之前创建的时间t是否相等。
+
+fmt.Println(now.Unix()) // 1648738080
+// 打印当前时间now的Unix时间戳（秒）。
+```
+
+数字解析
+
+```
+f, _ := strconv.ParseFloat("1.234", 64)
+fmt.Println(f) // 1.234
+// 使用strconv.ParseFloat函数将字符串"1.234"解析为64位的浮点数，并打印结果。
+
+n, _ := strconv.ParseInt("111", 10, 64)
+fmt.Println(n) // 111
+// 使用strconv.ParseInt函数将字符串"111"解析为64位的整数，基数为10（十进制），并打印结果。
+
+n, _ = strconv.ParseInt("0x1000", 0, 64)
+fmt.Println(n) // 4096
+// 使用strconv.ParseInt函数将字符串"0x1000"解析为64位的整数，前缀"0x"表示十六进制，基数为0表示自动识别（十六进制或十进制），并打印结果。
+
+n2, _ := strconv.Atoi("123")
+fmt.Println(n2) // 123
+// 使用strconv.Atoi函数将字符串"123"解析为int类型的整数，并打印结果。
+
+n2, err := strconv.Atoi("AAA")
+fmt.Println(n2, err) // 0 strconv.Atoi: parsing "AAA": invalid syntax
+// 使用strconv.Atoi函数尝试将字符串"AAA"解析为int类型的整数，由于"AAA"不是有效的数字字符串，因此返回错误，并打印结果和错误信息。
+```
+
+进程信息

@@ -1,0 +1,37 @@
+‌**在WSL2中删除文件后，磁盘空间未释放的主要原因是WSL2本质上是虚拟机，Windows会自动创建vhdx后缀的虚拟磁盘文件作为存储。这个vhdx文件可以自动扩容，但一般不会自动缩容，因此删除文件后需要手动进行压缩才能释放磁盘空间**‌‌
+
+##### 1、清理无用的 Docker 镜像
+
+打开WSL的linux终端，输入如下命令即可
+
+```undefined
+docker image prune 
+```
+
+##### 2、压缩WSL磁盘空间
+
+###### 先退出WSL系统，停掉WLS服务，打开PowerShell（管理员）, 输入如下命令
+
+```perl
+wsl --shutdown
+```
+
+###### 然后查看WSL中ubuntu的运行状态
+
+```undefined
+wsl -l -v
+```
+
+接下来就可以压缩磁盘了
+在PowerShell中逐一输入如下命令，每一步需要等待上一步完成后再执行，文件路径要换成自己的挂载路径
+
+```
+diskpart
+select vdisk file="D:\WSL\ext4.vhdx"
+attach vdisk readonly
+compact vdisk
+detach vdisk
+exit
+```
+
+执行完后，回到 windows打开此电脑，就可以看到磁盘空间释放了很多，红色已经消失了。

@@ -1,0 +1,24 @@
+确认防火墙允许外部访问 8001端口。10202端口不能使用，咱也不知道为啥
+
+```
+sudo firewall-cmd --add-port=8001/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+ssh隧道
+
+```
+ssh -g -L 8001:114.242.29.129:10202 root@202.4.130.138
+```
+
+sudo firewall-cmd --add-port=8001/tcp --permanent
+sudo firewall-cmd --reload
+
+使用autossh结合screen后台运行
+
+```
+screen -S autossh_session
+autossh -M 0 -N -g -L 8001:114.242.29.129:10202 root@202.4.130.138
+按 Ctrl+A 然后 D 来脱离 screen 会话，让 autossh 在后台继续运行。
+```
+

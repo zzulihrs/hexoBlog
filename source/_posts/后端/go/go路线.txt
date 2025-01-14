@@ -1,0 +1,171 @@
+## 基础
+
+### 语法：
+
+#### [Go入门教程](https://www.bilibili.com/video/BV1SS4y1T7kJ/?spm_id_from=333.999.0.0&vd_source=c486ded0b26b82075e9c932c97bc4fc1)
+
+[Go语言之路](https://www.liwenzhou.com/posts/Go/golang-menu/)
+
+#### [go语言圣经](https://golang-china.github.io/gopl-zh/index.html)
+
+#### 算法题:star:
+
+算法题是进大厂的关键，也可以提升编程能力，但不建议花特别多时间
+
+力扣hot100、剑指offer
+
+
+
+
+
+### 八股
+
+#### 小林coding的图解网络和操作系统:star:
+
+#### 小林coding的图解Mysql和Redis:star:
+
+#### [go语言面试题目汇总](https://geektutu.com/post/qa-golang.html)
+
+### 框架
+
+#### Web框架(Gin)
+
+
+
+#### ORM框架(必学Gorm):star:
+
+#### 
+
+### 技术和常用组件
+
+#### zap日志库
+
+#### viper项目配置管理
+
+#### Air项目热重启
+
+#### mysql:star:
+
+面试会考写sql，需要和编程语言一样熟练
+
+#### redis
+
+#### MongoDB
+
+了解即可
+
+#### docker/docker-compose:star:
+
+k8s可以不会，docker不会有点说不过去了
+
+#### linux基础
+
+#### git基础
+
+### 项目
+
+#### [原生Go语言博客实战](https://www.bilibili.com/video/BV1VS4y1F7NM/?spm_id_from=333.999.0.0&vd_source=c486ded0b26b82075e9c932c97bc4fc1)
+
+个人没做过，适合新手入门
+
+#### [Gin+WebSocket构建IM即时聊天Demo](Gin+WebSocket构建IM即时聊天Demo)
+
+练手项目
+
+#### [7天用Go从零实现系列](https://geektutu.com/post/gee.html):star:
+
+质量很高，作者对这些的理解较深刻，代码简短，需要有一定功底才能看懂。
+
+适合基础 -> 进阶，过度阶段。建议先有个基础项目开发经历再做。
+
+我写了其中的Web框架和分布式缓存，后续发现进阶里面的Go自研框架都有就没有继续写
+
+
+
+[字节跳动青训营抖音商城项目](https://bytedance.larkoffice.com/docx/Vhi7dqtNCom5iGxWbEKcQo9mnMc)
+
+适合基础 -> 进阶，过度阶段。
+
+使用了很多的字节的自研技术，但技术使用不深
+
+感觉课程质量一般，有时间可以在项目基础上进行改进
+
+
+
+## 进阶
+
+### 框架
+
+#### rpc框架(grpc)
+
+#### 微服务框架(go-zero)
+
+### 技术
+
+#### 消息队列:star:
+
+kafka、rabbitmq等挑一个学原理，面试高频
+
+#### k8s
+
+校招不要求会，但可以学学基础使用
+
+#### prometheus
+
+监控具体指标的，会使用最好
+
+#### 服务发现与注册
+
+etcd/consul
+
+#### 性能调优:star:
+
+[Go语言高性能编程](https://geektutu.com/post/high-performance-go.html)
+
+mysql优化、pprof性能监控（这两个是拿高薪的亮点）
+
+
+
+### 项目
+
+简历上面的项目，最好应该是3-4个，后两个是拿到高薪资的关键。
+
+没时间可以只写两个Web项目
+
+1. Web项目（证明你的基础开发能力）
+2. 微服务项目（最新技术的了解能力）
+3. 轮子项目/分布式项目（对代码更深层次的理解能力和较强的个人能力）
+
+
+
+#### Web项目：类禅道项目管理系统:star:
+
+#### 微服务项目：数字货币交易所
+
+非必要，没时间可以跳过
+
+可以把Web项目分成几个模块，改成微服务，加上一些优化和技术，这对个人能力要求更高
+
+#### 轮子项目：Go自研微服务框架:star:
+
+已完成1-17
+
+
+
+#### 分布式项目：MIT6.824:star:
+
+质量较高，难度有，学下来肯定有收获。时间不够可以跳过
+
+https://eraft.cn/
+
+
+
+### 设计模式:star:
+
+这种给出题目的应该还不错
+
+https://kamacoder.com/designpattern.php
+
+《Go设计模式》
+
+### 读源码(待补充)

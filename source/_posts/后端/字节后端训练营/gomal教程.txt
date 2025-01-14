@@ -1,0 +1,27 @@
+IDL interface definetion language
+
+IDL（Interface Definition Language）是一种用于定义软件组件之间接口的语言，它允许不同编程语言编写的组件相互通信。IDL定义了数据类型、接口和方法，可以被转换成多种编程语言的代码。它在分布式系统和网络服务中广泛应用，如CORBA和Web服务。
+
+
+
+air进行热重载，直接命令行air启动项目
+
+
+
+docker镜像：使用daocloud.io/library源
+
+```
+mysql:
+  image: daocloud.io/library/mysql:latest
+  ports:
+    - 3306:3306
+  environment:
+    - MYSQL_DATABASE=gorm
+    - MYSQL_USER=gorm
+    - MYSQL_PASSWORD=gorm
+    - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+redis:
+  image: daocloud.io/library/redis:latest
+  ports:
+    - 6379:6379
+```
